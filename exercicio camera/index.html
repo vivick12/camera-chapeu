@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: rgb(222, 149, 90);
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #foto {
+            height: 300px;
+            width: 300px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: 50%;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #camera {
+            width: 640px;
+            height: 480px;
+            margin: 20px auto;
+            transform: scaleX(-1);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .overlay {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            background-image: url();
+            pointer-events: none;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        button {
+            background-color: rgb(148, 13, 13);
+            color: white;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #a05945;
+        }
+        .explore {
+    margin-left: 400px;
+    margin-top: 60px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 35px;
+}
+@font-face {
+    font-family: 'rushi';
+    src: url(IntroRustL-Base2Line.otf);
+}
+
+span {
+
+    font-family: 'rushi';
+    color: rgb(122, 17, 17);
+    font-size: 35px;
+}
+    </style>
+</head>
+
+<body>
+    <h1>EXPLORE SEU MOMENTO <span>#LACOCINA</span> </h1>
+    <video id="camera" autoplay></video>
+    <div id="foto">
+        <div class="overlay" id="overlay"></div>
+    </div>
+    <button onclick="abrirCamera()">Abrir Câmera</button>
+    <button onclick="tirarFoto()">Tirar Foto</button>
+    <button onclick="mudarOverlay()">Mudar Overlay</button>
+    <button onclick="fechar()">Fechar Câmera</button>
+
+    <script>
+        var mediaStream;
+        var overlayIndex = 0; // Índice da imagem de overlay atual
+        var overlayImages = [
+            'url(il.png)', // Substitua pelo caminho da sua imagem overlay
+            'url(cha.png)',  // Substitua pelo caminho da sua segunda imagem overlay
+            'url(cro.png)', 
+            'url(ter.png)'   // Substitua pelo caminho da sua terceira imagem overlay
+            // Adicione mais imagens de overlay conforme necessário
+        ];
+
+        function abrirCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function (stream) {
+                mediaStream = stream;
+                const areaVideo = document.getElementById('camera');
+                areaVideo.srcObject = stream;
+            })
+                .catch(function (error) {
+                    console.error('Erro ao acessar a câmera:', error);
+                });
+        }
+
+        function tirarFoto() {
+            const areaVideo = document.getElementById('camera');
+            const canvas = document.createElement('canvas');
+            canvas.width = areaVideo.videoWidth;
+            canvas.height = areaVideo.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(areaVideo, 0, 0, canvas.width, canvas.height);
+            const imageDataURL = canvas.toDataURL();
+            const fotoDiv = document.getElementById('foto');
+            fotoDiv.style.backgroundImage = `url(${imageDataURL})`;
+
+            // Altera dinamicamente a imagem de overlay com base no índice atual
+            const overlayDiv = document.getElementById('overlay');
+            overlayDiv.style.backgroundImage = overlayImages[overlayIndex];
+        }
+
+        function mudarOverlay() {
+            // Muda para a próxima imagem de overlay
+            overlayIndex = (overlayIndex + 1) % overlayImages.length;
+        }
+
+        function fechar() {
+            navigator.mediaDevices.getUserMedia({ video: false });
+            const areaVideo = document.getElementById('camera');
+            areaVideo.srcObject = null;
+            mediaStream = null;
+        }
+    </script>
+</body>
+
+</html>
